@@ -6,16 +6,16 @@
 
 <style>
   :root {
-   --body-sidespan: -10pt; 
+   --body-sidespan: -10pt;
    }
   body{
     margin: 0;
   }
 
-  #app {
-    width: 100%;
+  #app{
     height: 100%;
-    background-color: rgb(220, 220, 220);
+    background-color: #f6f2f2;
     margin: 0;
+    padding: 0;
   }
 </style>

@@ -78,6 +78,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from 'vuex'
 import SearchResult from "../components/SearchResult";
+import {addNodeAPI} from "../api/node"
 export default {
     name: "Search",
     components: {SearchResult},
@@ -103,7 +104,10 @@ export default {
             console.log(this.searchInput)
         },
         search2 () {
-            this.showResult = true
+            // console.log(this.showResult)
+            let t = addNodeAPI({ chartId:1})
+          console.log(t)
+            // this.showResult = true
         }
     }
 }

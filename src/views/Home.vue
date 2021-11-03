@@ -21,10 +21,24 @@
 
 <script>
 import Drawer from '../components/KnowledgeGraph.vue'
+import {mapGetters,mapActions,mapMutations} from 'vuex'
 
 export default{
+  watch:{
+    ...mapGetters([])
+  },
   components:{
     Drawer,
+  },
+  async mounted(){
+    await this.findEdges()
+  },
+  methods:{
+    ...mapActions(["findEdge"]),
+    ...mapMutations([]),
+    async findEdges(){
+       await this.findEdge()
+    }
   }
 }
 </script>

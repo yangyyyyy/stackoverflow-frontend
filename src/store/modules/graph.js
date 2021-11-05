@@ -1,3 +1,4 @@
+import {getGraphAPI} from "../../api/graph"
 const graph={
     state:{
         graphList:[],
@@ -13,6 +14,12 @@ const graph={
     },
     actions:{
         async getGraph({commit}){
+            await getGraphAPI({id:4})
+            .then((res) => {
+                console.log("result",res)
+              })
+            .catch((err) => console.log(err));
+
             var res={
                 "success": true,
                 "message": null,

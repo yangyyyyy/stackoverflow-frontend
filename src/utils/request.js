@@ -4,7 +4,7 @@ import { VueAxios } from './axios'
 
 // 创建 axios 实例
 const service = axios.create({
-  baseURL: 'http://localhost:8081/',
+  baseURL: 'http://101.35.157.171:8089/example',
   withCredentials: true
 })
 console.log(process.env.NODE_ENV)

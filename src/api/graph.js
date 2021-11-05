@@ -2,6 +2,6 @@ import http from "../utils/http";
 
 const request='./api/chart'
 
-export function getGraphAPI(params){
+export function GetGraphAPI(params){
     return http.get(`${request}/getChart/${params.id}`)
 }

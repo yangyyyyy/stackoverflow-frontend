@@ -32,13 +32,19 @@ export default{
   },
   async mounted(){
     await this.findEdges()
+    // console.log("fin")
+    // await this.getGraphs()
   },
   methods:{
-    ...mapActions(["findEdge"]),
+    ...mapActions(["findEdge","getGraph"]),
     ...mapMutations([]),
     async findEdges(){
        await this.findEdge()
-    }
+    },
+    // async getGraphs(){
+    //   await this.getGraph()
+    //   console.log("hhhhh")
+    // }
   }
 }
 </script>

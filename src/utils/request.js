@@ -1,62 +1,80 @@
-import Vue from 'vue'
 import axios from 'axios'
-import { VueAxios } from './axios'
 
-// 创建 axios 实例
-const service = axios.create({
-  baseURL: 'http://101.35.157.171:8089/example',
-  withCredentials: true
+const request = axios.create({
+  baseURL: process.env.NODE_ENV === 'production' ? 'http://101.35.157.171:8089/example' : 'http://101.35.157.171:8089/example',
+  withCredentials: true,
+  timeout: 20 * 1000
 })
-console.log(process.env.NODE_ENV)
-const err = (error) => {
-  if (error.response) {
-    const data = error.response.data
-    const token = Vue.ls.get('ACCESS_TOKEN')
-    if (error.response.status === 403)
 
-    if (error.response.status === 401 && !(data.result && data.result.isLogin)) {
-      if (token) {
-        // store.dispatch('Logout').then(() => {
-        //   setTimeout(() => {
-        //     window.location.reload()
-        //   }, 1500)
-        // })
-      }
-    }
-  }
+request.interceptors.request.use(config => {
+  // config.data = JSON.stringify(config.data)
+  // config.headers = {
+  //   'Content-Type': 'application/x-www-form-urlencoded'
+  // }
+
+  // const token = getCookie('??')
+  // if (token) {
+  //   config.params = { 'token': token }
+  //   config.headers.token = token
+  // }
+  return config
+}, error => {
+  console.log(error)
+  Promise.reject(error)
+})
+
+request.interceptors.response.use(response => {
+  const res = response.data
+  return res
+}, error => {
+  // if (error && error.response) {
+  //   switch (error.response.status) {
+  //     case 400:
+  //       error.message = '????'
+  //       break
+  //     case 401:
+  //       error.message = '?????????'
+  //       break
+  //     case 403:
+  //       error.message = '????'
+  //       break
+  //     case 404:
+  //       error.message = '????,??????'
+  //       window.location.href = '/NotFound'
+  //       break
+  //     case 405:
+  //       error.message = '???????'
+  //       break
+  //     case 408:
+  //       error.message = '????'
+  //       break
+  //     case 500:
+  //       error.message = '??????'
+  //       break
+  //     case 501:
+  //       error.message = '?????'
+  //       break
+  //     case 502:
+  //       error.message = '????'
+  //       break
+  //     case 503:
+  //       error.message = '?????'
+  //       break
+  //     case 504:
+  //       error.message = '????'
+  //       break
+  //     case 505:
+  //       error.message = 'http????????'
+  //       break
+  //     default:
+  //       error.message = `????${error.response.status}`
+  //   }
+  // } else {
+  //   if (JSON.stringify(error).includes('timeout')) {
+  //   }
+  //   console.log(error.response.status)
+  //   error.message('???????')
+  // }
   return Promise.reject(error)
-}
-
-//request incerceptor
-service.interceptors.request.use((config) => {
-  const requestConfig = {
-    ...config,
-    url: `${config.url}`,
-  }
-  return requestConfig
-}, err)
-
-service.interceptors.response.use((response) => {
-  switch (response.status) {
-    case 200:
-      if(response.data.success && response.data.success){
-        return response.data.content
-      }
-      break
-    case 404:
-      return false
-    default:
-  }
 })
-
-const installer = {
-  vm: {},
-  install (Vue) {
-    Vue.use(VueAxios, service)
-  }
-}
-
-export {
-  installer as VueAxios,
-  service as axios
-}
+export default request

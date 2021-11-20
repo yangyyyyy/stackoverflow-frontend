@@ -2,12 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Search from "../views/Search";
+import IntroPage from "../views/IntroPage";
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/search',
     name: 'Search',
     component: Search
   },
@@ -16,6 +17,11 @@ const routes = [
     name: 'Home',
     component: Home
   },
+  {
+    path: '/',
+    name: 'IntroPage',
+    component: IntroPage
+  }
 ]
 
 const router = new VueRouter({

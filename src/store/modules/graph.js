@@ -2,7 +2,8 @@ import {GetGraphAPI} from "../../api/graph"
 const graph={
     state:{
         graphList:[],
-        isInit:false
+        isInit:false,
+        question: ''
     },
     mutations:{
         set_graphList:function(state,data){
@@ -10,6 +11,11 @@ const graph={
         },
         set_isInit:function(state,data){
             state.isInit=data
+        },
+        set_question:function (state, data) {
+            console.log('set: ' + data)
+            state.question = data
+            console.log('set: ' + state.question)
         }
     },
     actions:{

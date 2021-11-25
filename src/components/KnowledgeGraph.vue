@@ -35,6 +35,7 @@ export default {
     });
     this.getGraphList()
 
+
     // 通用的样式
     this.$cy.style()
     /* 未选择节点样式 */
@@ -162,7 +163,7 @@ export default {
     magnifying () {
       this.zoom(0.3)
     },
-    // 缩小 
+    // 缩小
     contractible () {
       this.zoom(-0.3)
     },
@@ -243,14 +244,11 @@ export default {
     var graph=this.$store.getters.graphList
       this.$cy.elements().remove()
       this.addEles(graph)
+      console.log(graph)
     //   if(!(this.$store.getters.isInitList[graphIndex])){
-    if(!(this.$store.getters.isInit)){
         this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.resize()
-      }else{
-        this.resize()
-      }
     },
 
   }

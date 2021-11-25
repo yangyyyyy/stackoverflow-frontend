@@ -31,9 +31,6 @@ export default{
     Drawer,
   },
   async mounted(){
-    await this.findEdges()
-    // console.log("fin")
-    // await this.getGraphs()
   },
   methods:{
     ...mapActions(["findEdge","getGraph"]),

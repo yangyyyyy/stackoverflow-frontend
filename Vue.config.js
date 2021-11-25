@@ -3,7 +3,7 @@ module.exports = {
         port: 8083,
         proxy: { //配置多个代理
             "/api": {
-              target: "http://101.35.157.171:8089/example",
+              target: "http://localhost:8081",
               changeOrigin: true,
               ws: true,//websocket支持
               secure: false,

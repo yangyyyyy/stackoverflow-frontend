@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'http://101.35.157.171:8089/example' : 'http://101.35.157.171:8089/example',
+  baseURL: process.env.NODE_ENV === 'production' ? 'http://localhost:8081' : 'http://localhost:8081',
   withCredentials: true,
   timeout: 20 * 1000
 })

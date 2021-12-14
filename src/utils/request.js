@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 const request = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' ? 'http://localhost:8081' : 'http://localhost:8081',
+  baseURL: process.env.NODE_ENV === '',
   withCredentials: true,
-  timeout: 20 * 1000
+  timeout: 200 * 1000
 })
 
 request.interceptors.request.use(config => {

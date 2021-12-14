@@ -1,6 +1,7 @@
 <style src='../assets/style/knowledgeGraph.css'></style>
 <template>
   <div class="drawer">
+    <button @click="getGraphContinuously">开始爬取</button>
     <div id="cytoscape_id"></div>
   </div>
 </template>
@@ -8,6 +9,7 @@
 <script>
 import cytoscape from "cytoscape";
 import { mapGetters, mapActions, mapMutations } from "vuex";
+import {GetPythonGraphAPI} from "@/api/graph";
 
 export default {
   name: "Drawer",
@@ -34,8 +36,6 @@ export default {
       boxSelectionEnabled: false,
     });
     this.getGraphList()
-
-
     // 通用的样式
     this.$cy.style()
     /* 未选择节点样式 */
@@ -237,20 +237,27 @@ export default {
     //获取图
     async getGraphList(){
       await this.getGraph()
-    //   var graphIndex=this.$store.getters.currentIndex
-    //   var allGraphs=this.$store.getters.allGraphList
-    //   var graph=allGraphs[graphIndex]
-    //   // console.log(graph)
-    var graph=this.$store.getters.graphList
+      //   var graphIndex=this.$store.getters.currentIndex
+      //   var allGraphs=this.$store.getters.allGraphList
+      //   var graph=allGraphs[graphIndex]
+      //   // console.log(graph)
+      var graph=this.$store.getters.graphList
       this.$cy.elements().remove()
       this.addEles(graph)
       console.log(graph)
-    //   if(!(this.$store.getters.isInitList[graphIndex])){
-        this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
+      //   if(!(this.$store.getters.isInitList[graphIndex])){
+      this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.resize()
     },
-
+    async getGraphContinuously(){
+       await GetPythonGraphAPI("python")
+           .then((res) => {
+             var graph =res.content
+             console.log(graph)
+           })
+           .catch((err) => console.log(err));
+    }
   }
 };
 </script>

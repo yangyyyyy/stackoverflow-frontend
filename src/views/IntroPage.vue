@@ -55,6 +55,8 @@
                 'question'
             ])
         },
+        mounted () {
+        },
         data () {
             return {
                 searchInput:'',
@@ -68,8 +70,6 @@
             ...mapActions([
                 'getResult'
             ]),
-            mounted () {
-            },
             async search2 () {
                 // console.log(this.showResult)
                 // let t = addNodeAPI({ chartId:1})

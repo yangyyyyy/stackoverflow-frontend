@@ -29,6 +29,8 @@
             ...mapGetters([
             ])
         },
+        mounted () {
+        },
       props:{
           item:{}
       },
@@ -42,8 +44,6 @@
             ]),
             ...mapActions([
             ]),
-            mounted () {
-            },
             toGraph () {
                 this.$router.push('/home')
             }

@@ -37,6 +37,9 @@ export default {
     });
     this.getGraphList()
     // 通用的样式
+    this.$cy.on('mouseover','node', function (event) {
+      console.log(event)
+    })
     this.$cy.style()
     /* 未选择节点样式 */
       .selector('node')
@@ -53,16 +56,16 @@ export default {
       })
       /* 已选择节点样式 */
       .selector("node:selected")
-      .style({ "border-color": "#c84e40", "border-width": "1px"})
+      .style({ "border-color": "#c84e40", "border-width": "2px"})
       /* 未选择节点样式 */
       .selector("edge")
       .style({
         label: "data(name)",
         "target-arrow-shape": "triangle" /* 箭头样式 */,
         "target-arrow-size": "1px" /* 箭头大小 */,
-        "target-arrow-color": "rgba(230,230,250,0.9)" /* 箭头颜色 */,
+        "target-arrow-color": "rgba(106,143,173,0.9)" /* 箭头颜色 */,
         "curve-style": "bezier" /* 线条样式曲线 */,
-        "line-color": "rgba(230,230,250,0.9)" /* 线条颜色 */,
+        "line-color": "rgba(106,143,173,0.9)" /* 线条颜色 */,
         width: "1px" /* 线条宽度 */,
         "font-size": "10px" /* 标签字体大小 */,
         color: "#000000" /* 标签字体大小 */,
@@ -73,9 +76,9 @@ export default {
       /* 已选择节点样式 */
       .selector("edge:selected")
       .style({
-        color: "#90acfc" /* 标签字体大小 */,
-        "target-arrow-color": "#9ad3f8" /* 箭头颜色 */,
-        "line-color": "#abdbfa" /* 线条颜色 */,
+        color: "#d07868" /* 标签字体大小 */,
+        "target-arrow-color": "#acd3ee" /* 箭头颜色 */,
+        "line-color": "#acd3ee" /* 线条颜色 */,
       })
       /* 高亮样式 */
       .selector(".light-off")
@@ -94,7 +97,7 @@ export default {
       .selector(".0")
       .style({'background-color': '#fce9cc'})
       .selector(".1")
-      .style({'background-color': '#aeeaf5'})
+      .style({'background-color': '#eaabb0'})
       .selector(".2")
       .style({'background-color': '#FFC0CB'})
       .selector(".3")

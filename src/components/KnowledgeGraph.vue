@@ -124,7 +124,6 @@ export default {
       ...mapMutations([]),
       // 添加元素
     addEles(eles) {
-      // console.log(eles)
       if (eles) {
         this.$cy.startBatch();
         this.$cy.batch(() => {
@@ -141,7 +140,6 @@ export default {
       this.$cy.startBatch();
       this.$cy.batch(() => {
         const selectedEles = this.$cy.elements(":selected");
-        // console.log(selectedEles)
         // 未选择不进行操作
         if (!selectedEles || selectedEles.length < 1) {
           return false
@@ -249,7 +247,6 @@ export default {
     //获取图
     async getGraphList(){
       this.question=this.$route.query.question
-      console.log(this.question)
       this.$cy.elements().remove()
       this.addEles({
         group: "nodes",
@@ -262,6 +259,7 @@ export default {
       this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.resize()
+      this.refresh()
     },
     async store_data(node_name){
       await PythonScratchAPI(node_name)
@@ -282,10 +280,11 @@ export default {
                   }
                   this.transform(res.nodes)
                   this.transform(res.edges)
+                  this.refresh()
                   }).catch((err) => console.log(err));
-              console.log(this.nodes)
-              console.log(this.node_ids)
-              console.log("received data")
+              // console.log(this.nodes)
+              // console.log(this.node_ids)
+              // console.log("received data")
     },
 
     async scratch(){
@@ -317,27 +316,27 @@ export default {
         var node=graph[item]
         console.log(node)
         const data = {}
-        data.id = node.data.name
-        if(node.group == 'nodes'){
-          data.name = node.data.name
-          data.labels = node.data.content
+        if(node.classes == 'node'){
+          data.id = node.node_name
+          data.name = node.node_content.title
+          this.addEles({
+            group: 'nodes',
+            data,
+            classes: "1",
+          })
         }
         else{
-          data.name = node.name
-          data.labels = node.content
+          data.id=node.edge_name
+          data.name = node.edge_group
+          // data.labels = node.node_content.tags
+          data.source=node.source
+          data.target=node.target
+          this.addEles({
+            group: 'edges',
+            data,
+            classes: "1",
+          })
         }
-        const toBeAdded = {
-          group: node.group,
-          data,
-          classes: "1",
-        }
-        if(node.group=='edges'){
-          toBeAdded.data.source=node.source
-          toBeAdded.data.target=node.target
-        }
-        console.log(toBeAdded)
-        this.addEles(toBeAdded)
-        this.resize()
       }
     }
 

@@ -1,9 +1,11 @@
 import {GetGraphAPI} from "../../api/graph"
+import {GetPythonGraphAPI} from "@/api/graph";
 const graph={
     state:{
         graphList:[],
         isInit:false,
-        question: ''
+        question: '',
+        searchResult:[],
     },
     mutations:{
         set_graphList:function(state,data){
@@ -16,7 +18,10 @@ const graph={
             console.log('set: ' + data)
             state.question = data
             console.log('set: ' + state.question)
-        }
+        },
+        set_searchResult:function(state,data){
+            state.searchResult=data
+        },
     },
     actions:{
         async getGraph({commit}){
@@ -880,7 +885,17 @@ const graph={
             //         }
             //     ]
             // }
+        },
+
+        async getResult({commit},question){
+            console.log("搜索后"+question)
+            await GetPythonGraphAPI(question)
+                .then((res)=>{
+                    commit("set_searchResult",res.results)
+                })
+                .catch((err) => console.log(err));
         }
+
     }
 }
 export default graph

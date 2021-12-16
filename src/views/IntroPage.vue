@@ -66,15 +66,20 @@
                 'set_question'
             ]),
             ...mapActions([
+                'getResult'
             ]),
             mounted () {
             },
-            search2 () {
+            async search2 () {
                 // console.log(this.showResult)
                 // let t = addNodeAPI({ chartId:1})
                 //   console.log(t)
                 this.set_question(this.searchInput)
-                this.$router.push('/search')
+              await this.getResult(this.searchInput)
+                  .then(()=>{
+                    this.$router.push('/search')
+                  })
+                  .catch((err) => console.log(err));
             }
         }
     }

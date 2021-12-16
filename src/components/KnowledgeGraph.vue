@@ -260,9 +260,8 @@ export default {
     async getGraphContinuously(){
        await GetPythonGraphAPI("java-stream")
            .then((res) => {
-             //var graph =res.content
-             console.log(res)
-             console.log("received data")
+             var graph =res
+             console.log(graph)
            })
            .catch((err) => console.log(err));
     },

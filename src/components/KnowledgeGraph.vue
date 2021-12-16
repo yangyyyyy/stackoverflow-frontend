@@ -9,7 +9,7 @@
 <script>
 import cytoscape from "cytoscape";
 import { mapGetters, mapActions, mapMutations } from "vuex";
-import {GetPythonGraphAPI, PythonScratchAPI} from "@/api/graph";
+import {PythonScratchAPI} from "@/api/graph";
 
 export default {
   name: "Drawer",
@@ -22,12 +22,13 @@ export default {
     delete this.$cy;
   },
   watch: {
-    ...mapGetters(["graphList"]),
+    ...mapGetters(["currentId","graphList"]),
   },
   props: {},
   components: {},
   computed: {},
   mounted() {
+    console.log(this.question)
     // 画布
     this.$cy = cytoscape({
       container: document.getElementById("cytoscape_id"),
@@ -111,10 +112,11 @@ export default {
   },
   data(){
     return {
+      question:{},
       nodes:[],
       edges:[],
       node_ids:[],
-      edge_ids:[]
+      edge_ids:[],
     }
   },
   methods:{
@@ -246,27 +248,20 @@ export default {
     },
     //获取图
     async getGraphList(){
-      await this.getGraph()
-      //   var graphIndex=this.$store.getters.currentIndex
-      //   var allGraphs=this.$store.getters.allGraphList
-      //   var graph=allGraphs[graphIndex]
-      //   // console.log(graph)
-      var graph=this.$store.getters.graphList
+      this.question=this.$route.query.question
+      console.log(this.question)
       this.$cy.elements().remove()
-      this.addEles(graph)
-      console.log(graph)
-      //   if(!(this.$store.getters.isInitList[graphIndex])){
+      this.addEles({
+        group: "nodes",
+        data:{
+          id:this.question.question_id,
+          name:this.question.title,
+        },
+        classes: "1",
+      })
       this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.resize()
-    },
-    async getGraphContinuously(){
-       await GetPythonGraphAPI("java-stream")
-           .then((res) => {
-             var graph =res
-             console.log(graph)
-           })
-           .catch((err) => console.log(err));
     },
     async store_data(node_name){
       await PythonScratchAPI(node_name)
@@ -284,8 +279,9 @@ export default {
                       this.edges.push(edge)
                       this.edge_ids.push(edge["edge_name"])
                     }
-                    //渲染用res.nodes和res.edges addeles来渲染
                   }
+                  this.transform(res.nodes)
+                  this.transform(res.edges)
                   }).catch((err) => console.log(err));
               console.log(this.nodes)
               console.log(this.node_ids)
@@ -295,8 +291,9 @@ export default {
     async scratch(){
        var startTime = new Date().getTime();
        var now = new Date().getTime();
-       this.nodes.push({"node_name":"q_34158634", "node_group":"question"})
-       this.node_ids.push("q_34158634")
+       this.nodes.push({"node_name":this.question.question_id, "node_group":"question"})
+       this.node_ids.push(this.question.question_id)
+
        while(this.nodes.length!=0){
         now =new Date().getTime()
         if (now - startTime> 10000){
@@ -314,6 +311,35 @@ export default {
         }
 
     },
+
+    transform(graph){
+      for (var item in graph) {
+        var node=graph[item]
+        console.log(node)
+        const data = {}
+        data.id = node.data.name
+        if(node.group == 'nodes'){
+          data.name = node.data.name
+          data.labels = node.data.content
+        }
+        else{
+          data.name = node.name
+          data.labels = node.content
+        }
+        const toBeAdded = {
+          group: node.group,
+          data,
+          classes: "1",
+        }
+        if(node.group=='edges'){
+          toBeAdded.data.source=node.source
+          toBeAdded.data.target=node.target
+        }
+        console.log(toBeAdded)
+        this.addEles(toBeAdded)
+        this.resize()
+      }
+    }
 
   }
 };

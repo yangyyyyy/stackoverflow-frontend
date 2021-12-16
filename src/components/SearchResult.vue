@@ -10,7 +10,7 @@
                     :content="detail">
                 <span slot="reference"> <div class="reliability-num">85%</div></span>
             </el-popover>
-            <el-button icon="el-icon-share" @click="toGraph">查看图谱</el-button>
+            <el-button icon="el-icon-share" @click="toGraph(item)">查看图谱</el-button>
         </div>
         <div class="card-right">
             <div class="question" v-if="item.title.length<this.longest">Q:&nbsp;{{item.title}}</div>
@@ -27,6 +27,7 @@
         name: "SearchResult",
         computed: {
             ...mapGetters([
+                'currentId'
             ])
         },
         mounted () {
@@ -41,11 +42,12 @@
         },
         methods: {
             ...mapMutations([
+                'set_currentId'
             ]),
             ...mapActions([
             ]),
-            toGraph () {
-                this.$router.push('/home')
+            toGraph (item) {
+                this.$router.push({path:'/home',query:{question:item}})
             }
         }
     }

@@ -6,6 +6,7 @@ const graph={
         isInit:false,
         question: '',
         searchResult:[],
+        currentId:'',
     },
     mutations:{
         set_graphList:function(state,data){
@@ -21,6 +22,9 @@ const graph={
         },
         set_searchResult:function(state,data){
             state.searchResult=data
+        },
+        set_currentId:function(state,data){
+            state.currentId=data
         },
     },
     actions:{

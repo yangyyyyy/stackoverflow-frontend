@@ -1,7 +1,7 @@
 <style src='../assets/style/knowledgeGraph.css'></style>
 <template>
   <div class="drawer">
-    <button @click="getGraphContinuously">开始爬取</button>
+    <button @click="scratch">开始爬取</button>
     <div id="cytoscape_id"></div>
   </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
 import cytoscape from "cytoscape";
 import { mapGetters, mapActions, mapMutations } from "vuex";
-import {GetPythonGraphAPI} from "@/api/graph";
+import {GetPythonGraphAPI, PythonScratchAPI} from "@/api/graph";
 
 export default {
   name: "Drawer",
@@ -106,7 +106,14 @@ export default {
       .selector(".6")
       .style({'background-color': '#B0E0E6'});
   },
-  data(){},
+  data(){
+    return {
+      nodes:[],
+      edges:[],
+      node_ids:[],
+      edge_ids:[]
+    }
+  },
   methods:{
       ...mapActions(["getGraph"]),
       ...mapMutations([]),
@@ -251,13 +258,61 @@ export default {
       this.resize()
     },
     async getGraphContinuously(){
-       await GetPythonGraphAPI("python")
+       await GetPythonGraphAPI("java-stream")
            .then((res) => {
-             var graph =res.content
-             console.log(graph)
+             //var graph =res.content
+             console.log(res)
+             console.log("received data")
            })
            .catch((err) => console.log(err));
-    }
+    },
+    async store_data(node_name){
+      await PythonScratchAPI(node_name)
+                .then((res) => {
+                  for (var i=0;i<res.nodes.length;i++){
+                  var node = res.nodes[i]
+                  if(this.node_ids.indexOf(node["node_name"])==-1){
+                    this.nodes.push(node)
+                    this.node_ids.push(node["node_name"])
+                    }
+                  }
+                  for ( i=0;i<res.edges.length;i++){
+                    var edge = res.edges[i]
+                    if(this.edge_ids.indexOf(edge["edge_name"])==-1){
+                      this.edges.push(edge)
+                      this.edge_ids.push(edge["edge_name"])
+                    }
+                    //渲染用res.nodes和res.edges addeles来渲染
+                  }
+                  }).catch((err) => console.log(err));
+              console.log(this.nodes)
+              console.log(this.node_ids)
+              console.log("received data")
+    },
+
+    async scratch(){
+       var startTime = new Date().getTime();
+       var now = new Date().getTime();
+       this.nodes.push({"node_name":"q_34158634", "node_group":"question"})
+       this.node_ids.push("q_34158634")
+       while(this.nodes.length!=0){
+        now =new Date().getTime()
+        if (now - startTime> 10000){
+          console.log(now-startTime)
+          break
+        }
+        var pop_node = this.nodes.shift()
+        if (pop_node["node_group"]!="question"){
+          continue
+        }
+        await this.store_data(pop_node["node_name"])
+           .then(() => {
+           })
+           .catch((err) => console.log(err));
+        }
+
+    },
+
   }
 };
 </script>

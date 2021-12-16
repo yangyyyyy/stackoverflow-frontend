@@ -9,3 +9,7 @@ export function GetGraphAPI(params){
 export function GetPythonGraphAPI(input){
     return http.get(`http://localhost:5000/pyapi/chart/search/${input}`)
 }
+
+export function PythonScratchAPI(question_id){
+    return http.get(`http://localhost:5000/pyapi/chart/scratch/${question_id}`)
+}

@@ -253,7 +253,7 @@ export default {
     async getGraphContinuously(){
        await GetPythonGraphAPI("python")
            .then((res) => {
-             var graph =res.content
+             var graph =res
              console.log(graph)
            })
            .catch((err) => console.log(err));

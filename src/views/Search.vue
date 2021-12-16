@@ -4,9 +4,9 @@
         <el-header>
             <div class="header_left">logo</div>
             <div class="header_right">
-                <div class="searchBox" v-if="showResult">
+                <div class="searchBox">
                     <el-input placeholder="请输入内容" v-model="searchInput" class="input-with-select">
-                        <el-button slot="append" icon="el-icon-search" @click="search" id="topbtn"></el-button>
+                        <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
                     </el-input>
                 </div>
                 <el-avatar style="float:right;margin-top: 10px" :size="40" src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png"></el-avatar>
@@ -19,17 +19,12 @@
             <el-scrollbar style="height: 100%;overflow-x: hidden">
                 <el-main class="resultBox">
                     <div class="resultHeader">
-                        <span style="font-weight: bold"> Search Result</span> for "{{searchInput}}"
-                        <div class="resultCount">{{resultCount}} results</div>
+                        <span style="font-weight: bold"> Search Result</span> for "{{this.question}}"
+                        <div class="resultCount">{{this.searchResult.length}} results</div>
                     </div>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
-                    <SearchResult></SearchResult>
+                  <li v-for="(item,index) in this.searchResult" :key="index">
+                    <SearchResult v-bind:item="item"></SearchResult>
+                  </li>
                     <el-pagination
                             layout="prev, pager, next"
                             page-size="8"
@@ -50,27 +45,34 @@ export default {
     components: {SearchResult},
     computed: {
         ...mapGetters([
-            'question'
+            'question',
+            'searchResult'
         ])
     },
     data () {
         return {
             searchInput:'',
-            resultCount: 150
+            resultCount: 150,
         }
     },
     async mounted () {
-        console.log('init: ' + this.question)
+        console.log(this.searchResult)
         this.searchInput = this.question
     },
     methods: {
-        ...mapMutations([
-        ]),
-        ...mapActions([
-        ]),
-        search () {
-            console.log(this.searchInput)
-        }
+      ...mapMutations([
+        'set_question'
+      ]),
+      ...mapActions([
+        'getResult'
+      ]),
+        async search () {
+          await this.getResult(this.searchInput)
+              .then(()=>{
+                this.set_question(this.searchInput)
+              })
+              .catch((err) => console.log(err));
+        },
     }
 }
 </script>

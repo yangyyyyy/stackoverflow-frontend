@@ -13,9 +13,10 @@
             <el-button icon="el-icon-share" @click="toGraph">查看图谱</el-button>
         </div>
         <div class="card-right">
-            <div class="question">Q:&nbsp;{{this.question}}</div>
-            <div class="answer">{{this.answer}}</div>
-            <el-tag size="medium" v-for="tag in tags" :key="tag">{{tag}}</el-tag>
+            <div class="question" v-if="item.title.length<this.longest">Q:&nbsp;{{item.title}}</div>
+          <div class="question" v-else>Q:&nbsp;{{item.title.substr(0,this.longest-3)}}...</div>
+            <div class="answer">回答数量： {{item.answer_count}}</div>
+            <el-tag size="medium" v-for="tag in item.tags" :key="tag">{{tag}}</el-tag>
         </div>
     </el-card>
 </template>
@@ -28,13 +29,12 @@
             ...mapGetters([
             ])
         },
+      props:{
+          item:{}
+      },
         data () {
             return {
-                question:'How can I get the current stack trace in Java?',
-                answer: 'How do I get the current stack trace in Java, like how in .NET you can do Environment.StackTrace? … I found Thread.dumpStack() but it is not what I want - I want to get the stack trace back, not print it out. …',
-                tags: ['Java', 'stack-trace'],
-                showDetailedRelia: false,
-                detail: '指标一：xxxxxxxxxxxxxxxxxxx指标二：xxxxxxxxxxxxxxxxxxx指标三：xxxxxxxxxxxxxxxxxxx'
+                longest:65,
             }
         },
         methods: {
@@ -104,6 +104,7 @@
         line-height: 30px;
         color: #004858;
         height: 70px;
+      font-size: 20px;
     }
     .el-tag {
         background-color: #91b1cb;

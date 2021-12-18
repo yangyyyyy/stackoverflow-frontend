@@ -2,6 +2,7 @@
 <template>
   <div class="drawer">
     <button @click="scratch">开始爬取</button>
+    <p>当前节点数：{{this.nodesNum}}</p>
     <div id="cytoscape_id"></div>
   </div>
 </template>
@@ -28,7 +29,6 @@ export default {
   components: {},
   computed: {},
   mounted() {
-    console.log(this.question)
     // 画布
     this.$cy = cytoscape({
       container: document.getElementById("cytoscape_id"),
@@ -50,9 +50,9 @@ export default {
         'text-valign': 'center',
         'text-halign': 'center',
         label: 'data(name)',
-        'font-size': '15pt',
-        width: '50pt',
-        height: '50pt',
+        'font-size': '5pt',
+        width: '50',
+        height: '50',
         'background-color': '#fce9cc',
       })
       /* 已选择节点样式 */
@@ -68,7 +68,7 @@ export default {
         "curve-style": "bezier" /* 线条样式曲线 */,
         "line-color": "rgba(106,143,173,0.9)" /* 线条颜色 */,
         width: "1px" /* 线条宽度 */,
-        "font-size": "10px" /* 标签字体大小 */,
+        "font-size": "8px" /* 标签字体大小 */,
         color: "#000000" /* 标签字体大小 */,
         // 'text-outline-color': 'white', /* 文本轮廓颜色 */
         // 'text-outline-width': '0.5px', /* 文本轮廓宽度 */
@@ -95,20 +95,29 @@ export default {
         "border-width": 12, // makes the handle easier to hit
         "border-opacity": 0,
       })
-      .selector(".0")
-      .style({'background-color': '#fce9cc'})
-      .selector(".1")
-      .style({'background-color': '#eaabb0'})
-      .selector(".2")
-      .style({'background-color': '#FFC0CB'})
-      .selector(".3")
-      .style({'background-color': '#FFF8DC'})
+        .selector(".1")
+        .style({'background-color': '#eaabb0'})
+        .selector(".2")
+        .style({'background-color': '#99f6a0'})
       .selector(".4")
       .style({'background-color': '#FFFACD'})
       .selector(".5")
       .style({'background-color': '#48D1CC'})
       .selector(".6")
-      .style({'background-color': '#B0E0E6'});
+      .style({'background-color': '#B0E0E6'})
+      .selector(".related")
+      .style({"line-color": "#FFFACD" /* 线条颜色 */,})
+      .selector(".answer")
+      .style({"line-color": '#48D1CC' /* 线条颜色 */,})
+    ;
+      for(var i=0;i<100;i++){
+        this.$cy.style().selector('.q'+i)
+            .style({'background-color': '#eaabb0',width:i+10,height:i+10})
+        .update()
+        this.$cy.style().selector('.a'+i)
+            .style({'background-color': '#99f6a0',width:i+10,height:i+10})
+            .update()
+      }
   },
   data(){
     return {
@@ -117,6 +126,7 @@ export default {
       edges:[],
       node_ids:[],
       edge_ids:[],
+      nodesNum:1,
     }
   },
   methods:{
@@ -247,18 +257,22 @@ export default {
     //获取图
     async getGraphList(){
       this.question=this.$route.query.question
+      console.log(this.question)
       this.$cy.elements().remove()
+      if(this.question.score<0){
+        this.question.score=0
+      }
       this.addEles({
         group: "nodes",
         data:{
           id:this.question.question_id,
-          name:this.question.title,
+          name:this.getQuestion(this.question.title),
+          size:this.question.score
         },
-        classes: "1",
+        classes: 'q'+this.question.score,
       })
       this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
-      this.resize()
       this.refresh()
     },
     async store_data(node_name){
@@ -267,20 +281,31 @@ export default {
                   for (var i=0;i<res.nodes.length;i++){
                   var node = res.nodes[i]
                   if(this.node_ids.indexOf(node["node_name"])==-1){
+                    let list=[]
+                    list.push(res.nodes[i])
+                    this.transform(list)
+                    this.refresh()
                     this.nodes.push(node)
                     this.node_ids.push(node["node_name"])
+                    this.nodesNum++;
+                    // var startTime = new Date().getTime();
+                    // // eslint-disable-next-line no-empty
+                    // while(new Date().getTime()-startTime<100){
+                    //
+                    // }
                     }
                   }
                   for ( i=0;i<res.edges.length;i++){
                     var edge = res.edges[i]
                     if(this.edge_ids.indexOf(edge["edge_name"])==-1){
+                      let list=[]
+                      list.push(res.edges[i])
+                      this.transform(list)
+                      this.refresh()
                       this.edges.push(edge)
                       this.edge_ids.push(edge["edge_name"])
                     }
                   }
-                  this.transform(res.nodes)
-                  this.transform(res.edges)
-                  this.refresh()
                   }).catch((err) => console.log(err));
               // console.log(this.nodes)
               // console.log(this.node_ids)
@@ -296,7 +321,7 @@ export default {
        while(this.nodes.length!=0){
         now =new Date().getTime()
         if (now - startTime> 10000){
-          console.log(now-startTime)
+          // console.log(now-startTime)
           break
         }
         var pop_node = this.nodes.shift()
@@ -305,6 +330,7 @@ export default {
         }
         await this.store_data(pop_node["node_name"])
            .then(() => {
+             console.log(pop_node["node_name"])
            })
            .catch((err) => console.log(err));
         }
@@ -314,15 +340,27 @@ export default {
     transform(graph){
       for (var item in graph) {
         var node=graph[item]
-        console.log(node)
         const data = {}
         if(node.classes == 'node'){
           data.id = node.node_name
-          data.name = node.node_content.title
+          data.name = node.node_content.score
+          data.size = node.node_content.score
+          if(data.size<0){
+            data.size=0
+          }
+          if(data.size>=100){
+            data.size=99
+          }
+          console.log(node)
+          let classes="a"
+          if(node.node_group=="question"){
+            classes="q"
+            data.name = this.getQuestion(node.node_content.title)
+          }
           this.addEles({
             group: 'nodes',
             data,
-            classes: "1",
+            classes: classes+data.size,
           })
         }
         else{
@@ -334,10 +372,35 @@ export default {
           this.addEles({
             group: 'edges',
             data,
-            classes: "1",
+            classes: node.edge_group,
           })
         }
       }
+    },
+    getQuestion(q){
+      var maxWidth=10
+      if(q.length<maxWidth){
+        return q
+      }
+      return q.substr(0,maxWidth)+"..."
+      // for(var i=0;i<3;i++){
+      //   if(q.length-i*maxWidth>maxWidth){
+      //     res+=q.substr(i*maxWidth,maxWidth)
+      //     res+="\r"
+      //   }
+      //   else{
+      //     res+=q.substr(i*maxWidth,q.length-i*maxWidth)
+      //     break;
+      //   }
+      // }
+      // if(q.length-3*maxWidth>maxWidth){
+      //   res+=q.substr(3*maxWidth,maxWidth-3)
+      //   res+="...\r"
+      // }
+      // else if(q.length-3*maxWidth>0){
+      //   res+=q.substr(3*maxWidth,q.length-3*maxWidth)
+      // }
+      // return res
     }
 
   }

@@ -15,7 +15,7 @@
         <div class="card-right">
             <div class="question" v-if="item.title.length<this.longest">Q:&nbsp;{{item.title}}</div>
           <div class="question" v-else>Q:&nbsp;{{item.title.substr(0,this.longest-3)}}...</div>
-            <div class="answer">回答数量： {{item.answer_count}}</div>
+            <div class="answer">回答数量： {{item.answer_count}}        得分：{{item.score}}</div>
             <el-tag size="medium" v-for="tag in item.tags" :key="tag">{{tag}}</el-tag>
         </div>
     </el-card>

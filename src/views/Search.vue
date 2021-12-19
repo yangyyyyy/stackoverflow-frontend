@@ -25,11 +25,11 @@
                   <li v-for="(item,index) in this.searchResult" :key="index">
                     <SearchResult v-bind:item="item"></SearchResult>
                   </li>
-                    <el-pagination
-                            layout="prev, pager, next"
-                            page-size="8"
-                            :total="resultCount">
-                    </el-pagination>
+<!--                    <el-pagination-->
+<!--                            layout="prev, pager, next"-->
+<!--                            page-size="8"-->
+<!--                            :total="resultCount">-->
+<!--                    </el-pagination>-->
                 </el-main>
             </el-scrollbar>
         </el-container>

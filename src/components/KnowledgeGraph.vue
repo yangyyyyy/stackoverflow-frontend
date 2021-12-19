@@ -1,9 +1,23 @@
 <style src='../assets/style/knowledgeGraph.css'></style>
 <template>
   <div class="drawer">
-    <button @click="scratch">开始爬取</button>
     <p>当前节点数：{{this.nodesNum}}</p>
-    <div id="cytoscape_id"></div>
+    <el-row>
+      <el-col :span="18"><div id="cytoscape_id"></div></el-col>
+      <el-col :span="6"><el-card class="box-card" style="height: 300px">
+        <div v-if="showCard&&currentNode.answer_id==undefined">
+          <p>Question:{{currentNode.title}}</p>
+          <p>Answer_count:{{currentNode.answer_count}}</p>
+          <p>Score:{{currentNode.score}}</p>
+          <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
+        </div>
+        <div v-else-if="showCard">
+          <p>isAccepted:{{currentNode.is_accepted}}</p>
+          <p>Score:{{currentNode.score}}</p>
+          <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
+        </div>
+      </el-card></el-col>
+    </el-row>
   </div>
 </template>
 
@@ -11,6 +25,10 @@
 import cytoscape from "cytoscape";
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import {PythonScratchAPI} from "@/api/graph";
+import cxtmenu from 'cytoscape-cxtmenu';
+import cola from 'cytoscape-cola';
+import avsdf from 'cytoscape-avsdf';
+import coseBilkent from 'cytoscape-cose-bilkent';
 
 export default {
   name: "Drawer",
@@ -29,6 +47,13 @@ export default {
   components: {},
   computed: {},
   mounted() {
+    if (!cytoscape().cxtmenu) {
+      cytoscape.use(cxtmenu);
+      cytoscape.use(cola);
+      cytoscape.use(avsdf);
+      cytoscape.use(coseBilkent);
+      // cytoscape.use(popup);
+    }
     // 画布
     this.$cy = cytoscape({
       container: document.getElementById("cytoscape_id"),
@@ -38,8 +63,15 @@ export default {
     });
     this.getGraphList()
     // 通用的样式
-    this.$cy.on('mouseover','node', function (event) {
-      console.log(event)
+    const that = this
+    this.$cy.on('mouseover','node',function(e){
+      console.log(e.target.data().content)
+      that.currentNode=e.target.data().content
+      that.showCard=true
+    })
+    this.$cy.on('mouseout','node',function(){
+      that.currentNode= {}
+      that.showCard=false
     })
     this.$cy.style()
     /* 未选择节点样式 */
@@ -51,8 +83,8 @@ export default {
         'text-halign': 'center',
         label: 'data(name)',
         'font-size': '5pt',
-        width: '50',
-        height: '50',
+        width: '80',
+        height: '80',
         'background-color': '#fce9cc',
       })
       /* 已选择节点样式 */
@@ -96,10 +128,10 @@ export default {
         "border-opacity": 0,
       })
         .selector(".1")
-        .style({'background-color': '#eaabb0'})
+        .style({'background-color': '#e53846'})
         .selector(".2")
         .style({'background-color': '#99f6a0'})
-      .selector(".4")
+      .selector(".question")
       .style({'background-color': '#FFFACD'})
       .selector(".5")
       .style({'background-color': '#48D1CC'})
@@ -117,7 +149,61 @@ export default {
         this.$cy.style().selector('.a'+i)
             .style({'background-color': '#99f6a0',width:i+10,height:i+10})
             .update()
+        this.$cy.style().selector('.aa'+i)
+            .style({'background-color': '#25ee35',width:i+10,height:i+10})
+            .update()
       }
+    // Cxtmenu圆形菜单--开始
+    this.$cy.cxtmenu({
+      menuRadius: 80, // the radius of the circular menu in pixels
+      selector: 'node', // elements matching that Cytoscape.js selector will trigger cxtmenus
+      commands: () => {
+        return [
+          {
+            fillColor: 'rgba(200, 200, 200, 0.75)', // optional: custom background color for item
+            content: '<span class="fa fa-flash fa-2x">爬取信息</span>', // html/text content to be displayed in the menu
+            contentStyle: {}, // css key:value pairs to set the command's css in js if you want
+            select: (ele) => {this.nodes.push({"node_name":ele.id(), "node_group":"question"});this.scratch()},
+            enabled: true, // whether the command is selectable
+          },
+          {
+            // fillColor: 'rgba(200, 200, 200, 0.75)', // optional: custom background color for item
+            content: '详情信息', // html/text content to be displayed in the menu
+            // contentStyle: {}, // css key:value pairs to set the command's css in js if you want
+            select: () => {
+              if(this.currentNode.answer_id==undefined){
+                window.open(this.currentNode.link)
+              }
+              else{
+                window.open("https://stackoverflow.com/a/"+this.currentNode.answer_id)
+              }
+            },  // a function to execute when the command is selected
+            enablxzed: true, // whether the command is selectable
+          },
+          {
+            // fillColor: 'rgba(200, 200, 200, 0.75)', // optional: custom background color for item
+            content: '删除', // html/text content to be displayed in the menu
+            // contentStyle: {}, // css key:value pairs to set the command's css in js if you want
+            select: (ele) => this.delEle([ele.id()]),  // a function to execute when the command is selected
+            enabled: true, // whether the command is selectable
+          }
+        ]
+      },
+      fillColor: 'rgba(0, 0, 0, 0.75)', // 指令默认颜色(the background colour of the menu)
+      activeFillColor: 'rgba(1, 105, 217, 0.75)', // 所选指令的颜色(the colour used to indicate the selected command)
+      activePadding: 10, // additional size in pixels for the active command
+      indicatorSize: 14, // the size in pixels of the pointer to the active command
+      separatorWidth: 4, //连续命令之间的空白间隔(以像素为单位)
+      spotlightPadding: 10, //元素和聚光灯之间的额外间距(以像素为单位)
+      minSpotlightRadius: 10, // the minimum radius in pixels of the spotlight
+      maxSpotlightRadius: 14, // the maximum radius in pixels of the spotlight
+      openMenuEvents: 'cxttapstart taphold', // space-separated cytoscape events that will open the menu; only `cxttapstart` and/or `taphold` work here
+      itemColor: 'white', // 各指令元素内字体颜色
+      itemTextShadowColor: 'red', // 各指令元素内字体阴影颜色
+      zIndex: 9999, // the z-index of the ui div
+      atMouse: true, // draw menu at mouse position
+    });
+    //Cxtmenu圆形菜单--结束
   },
   data(){
     return {
@@ -127,6 +213,8 @@ export default {
       node_ids:[],
       edge_ids:[],
       nodesNum:1,
+      currentNode:{},
+      showCard:false,
     }
   },
   methods:{
@@ -145,18 +233,14 @@ export default {
         this.$cy.endBatch()
       }
     },
-    // 删除选择的内容(可能是顶点, 也可能是关系)
-     delEles() {
+    delEle(ele) {
       this.$cy.startBatch();
       this.$cy.batch(() => {
-        const selectedEles = this.$cy.elements(":selected");
-        // 未选择不进行操作
-        if (!selectedEles || selectedEles.length < 1) {
-          return false
-        }
-        selectedEles.remove()
-      })
-      this.$cy.endBatch()
+        let elements = this.$cy.getElementById(ele);
+        elements.remove();
+      });
+      this.$cy.endBatch();
+      this.nodesNum--;
     },
     // 缩放大小
     zoom(zoom) {
@@ -266,14 +350,16 @@ export default {
         group: "nodes",
         data:{
           id:this.question.question_id,
-          name:this.getQuestion(this.question.title),
-          size:this.question.score
+          name:this.getQuestion(this.question.title,75),
+          size:this.question.score,
+          content:this.question,
         },
-        classes: 'q'+this.question.score,
+        classes: '1',
       })
       this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.refresh()
+      this.scratch()
     },
     async store_data(node_name){
       await PythonScratchAPI(node_name)
@@ -284,8 +370,7 @@ export default {
                     let list=[]
                     list.push(res.nodes[i])
                     this.transform(list)
-                    this.refresh()
-                    this.nodes.push(node)
+                    // this.nodes.push(node)
                     this.node_ids.push(node["node_name"])
                     this.nodesNum++;
                     // var startTime = new Date().getTime();
@@ -301,11 +386,11 @@ export default {
                       let list=[]
                       list.push(res.edges[i])
                       this.transform(list)
-                      this.refresh()
                       this.edges.push(edge)
                       this.edge_ids.push(edge["edge_name"])
                     }
                   }
+                  this.refresh()
                   }).catch((err) => console.log(err));
               // console.log(this.nodes)
               // console.log(this.node_ids)
@@ -345,8 +430,28 @@ export default {
           data.id = node.node_name
           data.name = node.node_content.score
           data.size = node.node_content.score
+          data.node_group = "answer"
+          data.content=node.node_content
           if(data.size<0){
             data.size=0
+          }
+          if(data.size>=20){
+            data.size=Math.floor(20+(data.size-20)/5)
+          }
+          if(data.size>=50){
+            data.size=Math.floor(50+(data.size-50)/5)
+          }
+          if(data.size>=60){
+            data.size=Math.floor(60+(data.size-60)/5)
+          }
+          if(data.size>=70){
+            data.size=Math.floor(70+(data.size-70)/5)
+          }
+          if(data.size>=80){
+            data.size=Math.floor(80+(data.size-80)/8)
+          }
+          if(data.size>=90){
+            data.size=Math.floor(90+(data.size-90)/8)
           }
           if(data.size>=100){
             data.size=99
@@ -355,13 +460,20 @@ export default {
           let classes="a"
           if(node.node_group=="question"){
             classes="q"
-            data.name = this.getQuestion(node.node_content.title)
+            data.name = this.getQuestion(node.node_content.title,data.size+5)
+            data.node_group="question"
+          }
+          else{
+            if(node.node_content.is_accepted){
+              classes="aa"
+            }
           }
           this.addEles({
             group: 'nodes',
             data,
             classes: classes+data.size,
           })
+          // this.$cy.$(data.id).addClass("question")
         }
         else{
           data.id=node.edge_name
@@ -377,12 +489,11 @@ export default {
         }
       }
     },
-    getQuestion(q){
-      var maxWidth=10
+    getQuestion(q,maxWidth){
       if(q.length<maxWidth){
         return q
       }
-      return q.substr(0,maxWidth)+"..."
+      return q.substr(0,maxWidth-3)+"..."
       // for(var i=0;i<3;i++){
       //   if(q.length-i*maxWidth>maxWidth){
       //     res+=q.substr(i*maxWidth,maxWidth)

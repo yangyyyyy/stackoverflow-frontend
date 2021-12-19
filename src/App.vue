@@ -4,6 +4,12 @@
   </div>
 </template>
 
+<script>
+  export default {
+    name: 'App'
+  }
+</script>
+
 <style>
   :root {
    --body-sidespan: -10pt;
@@ -13,9 +19,6 @@
   }
 
   #app{
-    height: 100%;
     background-color: #f6f2f2;
-    margin: 0;
-    padding: 0;
   }
 </style>

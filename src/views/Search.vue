@@ -1,5 +1,5 @@
 <template>
-    <el-container direction="vertical">
+    <el-container class="all" direction="vertical">
 <!--        <div class="top_line"></div>-->
         <el-header>
             <div class="header_left">logo</div>
@@ -16,7 +16,7 @@
         <!--搜索结果展示-->
         <el-container direction="horizontal" style="width: 80%;margin-left: 10%;margin-top: 2%">
             <el-aside width="20%"> </el-aside>
-            <el-scrollbar style="height: 100%;overflow-x: hidden">
+            <el-scrollbar style="height: 100%;width:100%;overflow-x: hidden">
                 <el-main class="resultBox">
                     <div class="resultHeader">
                         <span style="font-weight: bold"> Search Result</span> for "{{this.question}}"
@@ -25,11 +25,11 @@
                   <li v-for="(item,index) in this.searchResult" :key="index">
                     <SearchResult v-bind:item="item"></SearchResult>
                   </li>
-                    <el-pagination
-                            layout="prev, pager, next"
-                            page-size="8"
-                            :total="resultCount">
-                    </el-pagination>
+<!--                    <el-pagination-->
+<!--                            layout="prev, pager, next"-->
+<!--                            page-size="8"-->
+<!--                            :total="resultCount">-->
+<!--                    </el-pagination>-->
                 </el-main>
             </el-scrollbar>
         </el-container>
@@ -55,7 +55,7 @@ export default {
             resultCount: 150,
         }
     },
-    async mounted () {
+    mounted () {
         console.log(this.searchResult)
         this.searchInput = this.question
     },
@@ -78,6 +78,12 @@ export default {
 </script>
 
 <style scoped>
+    .all {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #f6f2f2;
+    }
     .header_left{
         width: 20%;
         float: left;

@@ -10,12 +10,12 @@
                     :content="detail">
                 <span slot="reference"> <div class="reliability-num">85%</div></span>
             </el-popover>
-            <el-button icon="el-icon-share" @click="toGraph">查看图谱</el-button>
+            <el-button icon="el-icon-share" @click="toGraph(item)">查看图谱</el-button>
         </div>
         <div class="card-right">
             <div class="question" v-if="item.title.length<this.longest">Q:&nbsp;{{item.title}}</div>
           <div class="question" v-else>Q:&nbsp;{{item.title.substr(0,this.longest-3)}}...</div>
-            <div class="answer">回答数量： {{item.answer_count}}</div>
+            <div class="answer">回答数量： {{item.answer_count}}        得分：{{item.score}}</div>
             <el-tag size="medium" v-for="tag in item.tags" :key="tag">{{tag}}</el-tag>
         </div>
     </el-card>
@@ -27,7 +27,10 @@
         name: "SearchResult",
         computed: {
             ...mapGetters([
+                'currentId'
             ])
+        },
+        mounted () {
         },
       props:{
           item:{}
@@ -39,13 +42,12 @@
         },
         methods: {
             ...mapMutations([
+                'set_currentId'
             ]),
             ...mapActions([
             ]),
-            mounted () {
-            },
-            toGraph () {
-                this.$router.push('/home')
+            toGraph (item) {
+                this.$router.push({path:'/home',query:{question:item}})
             }
         }
     }

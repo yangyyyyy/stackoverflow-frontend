@@ -289,14 +289,15 @@ export default {
               console.log("received data")
     },
 
-    async scratch(){
+    async scratch(input){
        var startTime = new Date().getTime();
        var now = new Date().getTime();
        this.nodes.push({"node_name":"q_34158634", "node_group":"question"})
        this.node_ids.push("q_34158634")
+       //初始node渲染
        while(this.nodes.length!=0){
         now =new Date().getTime()
-        if (now - startTime> 10000){
+        if (now - startTime> 10*1000){
           console.log(now-startTime)
           break
         }

@@ -13,3 +13,11 @@ export function GetPythonGraphAPI(input){
 export function PythonScratchAPI(question_id){
     return http.get(`http://localhost:5000/pyapi/chart/scratch/${question_id}`)
 }
+
+export function PythonContentAPI(id){
+    return http.get(`http://localhost:5000/pyapi/chart/content/${id}`)
+}
+
+export function PythonQuestionContentAPI(id){
+    return http.get(`http://localhost:5000/pyapi/chart/qcontent/${id}`)
+}

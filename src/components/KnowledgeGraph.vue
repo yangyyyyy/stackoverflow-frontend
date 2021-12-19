@@ -24,7 +24,7 @@
 <script>
 import cytoscape from "cytoscape";
 import { mapGetters, mapActions, mapMutations } from "vuex";
-import {PythonScratchAPI} from "@/api/graph";
+import {PythonScratchAPI, PythonContentAPI, PythonQuestionContentAPI} from "@/api/graph";
 import cxtmenu from 'cytoscape-cxtmenu';
 import cola from 'cytoscape-cola';
 import avsdf from 'cytoscape-avsdf';
@@ -172,10 +172,12 @@ export default {
             // contentStyle: {}, // css key:value pairs to set the command's css in js if you want
             select: () => {
               if(this.currentNode.answer_id==undefined){
-                window.open(this.currentNode.link)
+                this.showQuestionContent(this.currentNode.question_id)
+                //window.open(this.currentNode.link)
               }
               else{
-                window.open("https://stackoverflow.com/a/"+this.currentNode.answer_id)
+                //url = "https://stackoverflow.com/a/"+this.currentNode.answer_id
+                this.showContent(this.currentNode.answer_id)
               }
             },  // a function to execute when the command is selected
             enablxzed: true, // whether the command is selectable
@@ -220,6 +222,32 @@ export default {
   methods:{
       ...mapActions(["getGraph"]),
       ...mapMutations([]),
+
+    async showContent(answer_id){
+      await PythonContentAPI(answer_id)
+                .then((res) => {
+                  this.$notify({
+                    title: '提示',
+                    dangerouslyUseHTMLString: true,
+                    message: res,
+                    duration: 0
+                  });
+                  //window.open("https://stackoverflow.com/a/"+answer_id)
+                }).catch((err) => console.log(err));
+    },
+    async showQuestionContent(question_id){
+      question_id = question_id.toString().substr(2)
+      await PythonQuestionContentAPI(question_id)
+                .then((res) => {
+                  this.$notify({
+                    title: '提示',
+                    dangerouslyUseHTMLString: true,
+                    message: res,
+                    duration: 0
+                  });
+                  //window.open("https://stackoverflow.com/a/"+answer_id)
+                }).catch((err) => console.log(err));
+    },
       // 添加元素
     addEles(eles) {
       if (eles) {
@@ -397,7 +425,7 @@ export default {
               // console.log("received data")
     },
 
-    async scratch(input){
+    async scratch(){
        var startTime = new Date().getTime();
        var now = new Date().getTime();
        this.nodes.push({"node_name":this.question.question_id, "node_group":"question"})

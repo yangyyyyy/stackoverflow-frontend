@@ -27,6 +27,9 @@
                     {name: 'opencv', value: 14023},
                     {name: 'nodejs', value: 21046},
                     {name: 'javascript', value: 19420},
+                ],
+                colorlist: [
+                   '#e7ac67','#5e8040','#9c9bd4','#a8222b' ,'#a0947f','#6a8fad','#004858','#e48082','#a48477','#9dbdc6','#547c69'
                 ]
             }
         },
@@ -52,13 +55,7 @@
                             textStyle: {
                                 color: function () {
                                     return (
-                                        "rgb(" +
-                                        Math.round(Math.random() * 255) +
-                                        ", " +
-                                        Math.round(Math.random() * 255) +
-                                        ", " +
-                                        Math.round(Math.random() * 255) +
-                                        ")"
+                                        that.colorlist[Math.floor((Math.random()*that.colorlist.length))]
                                     );
                                 },
                             },

@@ -1,10 +1,59 @@
 <style src='../assets/style/knowledgeGraph.css'></style>
 <template>
   <div class="drawer">
-    <p>当前节点数：{{this.nodesNum}}</p>
     <el-row>
-      <el-col :span="18"><div id="cytoscape_id"></div></el-col>
-      <el-col :span="6"><el-card class="box-card" style="height: 300px">
+      <el-col :span="18">
+<!--        <el-tag size="medium" v-for="tag in tags" :key="tag">{{tag}}</el-tag>-->
+        <div id="cytoscape_id"></div>
+        <div id="cytoolbar_id"
+             style="position: absolute; left: 5pt; top: 5pt; z-index: 2; background-color: rgba(249, 249, 249, 0.9);" data-step="1" data-intro="欢迎来到新手引导！此处为工具栏">
+
+          <div class="tools">
+            <div class="center-center">
+              <Icon style="font-size: 32px; cursor: pointer;" title="刷新布局" class="el-icon-refresh"
+                    @click="refresh({name: 'cola'})"/>
+            </div>
+          </div>
+          <div class="tools">
+            <div class="center-center">
+              <Icon style="font-size: 32px; cursor: pointer;" title="网格布局" class="el-icon-s-grid"
+                    @click="refresh({name: 'grid'})"/>
+            </div>
+          </div>
+          <div class="tools">
+            <div class="center-center">
+              <Icon style="font-size: 32px; cursor: pointer;" title="环形布局" class="el-icon-s-help"
+                    @click="refresh({name: 'circle'})"/>
+            </div>
+          </div>
+          <div class="tools">
+            <div class="center-center">
+              <Icon style="font-size: 32px; cursor: pointer;" title="全图导出" class="el-icon-picture-outline-round"
+                    @click="exportPng()"/>
+            </div>
+          </div>
+          <div class="tools">
+            <div class="center-center">
+              <Icon style="font-size: 32px; cursor: pointer;" title="文本导出" class="el-icon-document" @click="exportFile()"/>
+            </div>
+          </div>
+<!--          <div class="tools">-->
+<!--            <div class="center-center">-->
+<!--              <Icon style="font-size: 32px; cursor: pointer;" title="类型过滤" class="el-icon-s-flag"-->
+<!--                    @click="filterInit"/>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="tools">-->
+<!--            <div class="center-center">-->
+<!--              <Icon style="font-size: 32px; cursor: pointer;" title="搜索" class="el-icon-search" @click="searchDialogVisible=true"/>-->
+<!--            </div>-->
+<!--          </div>-->
+        </div>
+        <el-dialog v-dialogDrag title="搜索节点" :visible.sync="searchDialogVisible" :modal-append-to-body=false>
+        </el-dialog>
+      </el-col>
+      <el-col :span="6"><el-card class="box-card" style="height: auto">
+        <h2>当前节点数：{{this.nodesNum}}</h2>
         <div v-if="showCard&&currentNode.answer_id==undefined">
           <p>Question:{{currentNode.title}}</p>
           <p>Answer_count:{{currentNode.answer_count}}</p>
@@ -16,13 +65,20 @@
           <p>Score:{{currentNode.score}}</p>
           <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
         </div>
-      </el-card></el-col>
+        <div v-if="detail!==''" v-html="detail"></div>
+        <el-table v-else
+                  v-loading="loading"
+                  element-loading-text="拼命加载中"
+                  element-loading-spinner="el-icon-loading"></el-table>
+      </el-card>
+      </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
 import cytoscape from "cytoscape";
+import FileSaver from 'file-saver';
 import { mapGetters, mapActions, mapMutations } from "vuex";
 import {PythonScratchAPI, PythonContentAPI, PythonQuestionContentAPI} from "@/api/graph";
 import cxtmenu from 'cytoscape-cxtmenu';
@@ -68,11 +124,18 @@ export default {
       console.log(e.target.data().content)
       that.currentNode=e.target.data().content
       that.showCard=true
+      that.detail=""
+      if(that.currentNode.answer_id==undefined){
+        that.showQuestionContent(that.currentNode.question_id)
+      }
+      else{
+        that.showContent(that.currentNode.answer_id)
+      }
     })
-    this.$cy.on('mouseout','node',function(){
-      that.currentNode= {}
-      that.showCard=false
-    })
+    // this.$cy.on('mouseout','node',function(){
+    //   that.currentNode= {}
+    //   that.showCard=false
+    // })
     this.$cy.style()
     /* 未选择节点样式 */
       .selector('node')
@@ -217,6 +280,10 @@ export default {
       nodesNum:1,
       currentNode:{},
       showCard:false,
+      detail:"",
+      loading:true,
+      searchDialogVisible:false,
+      tags:new Set,
     }
   },
   methods:{
@@ -226,12 +293,13 @@ export default {
     async showContent(answer_id){
       await PythonContentAPI(answer_id)
                 .then((res) => {
-                  this.$notify({
-                    title: '提示',
-                    dangerouslyUseHTMLString: true,
-                    message: res,
-                    duration: 0
-                  });
+                  // this.$notify({
+                  //   title: '详情信息',
+                  //   dangerouslyUseHTMLString: true,
+                  //   message: res,
+                  //   duration: 0
+                  // }
+                  this.detail=res
                   //window.open("https://stackoverflow.com/a/"+answer_id)
                 }).catch((err) => console.log(err));
     },
@@ -239,12 +307,13 @@ export default {
       question_id = question_id.toString().substr(2)
       await PythonQuestionContentAPI(question_id)
                 .then((res) => {
-                  this.$notify({
-                    title: '提示',
-                    dangerouslyUseHTMLString: true,
-                    message: res,
-                    duration: 0
-                  });
+                  // this.$notify({
+                  //   title: '提示',
+                  //   dangerouslyUseHTMLString: true,
+                  //   message: res,
+                  //   duration: 0
+                  // });
+                  this.detail=res
                   //window.open("https://stackoverflow.com/a/"+answer_id)
                 }).catch((err) => console.log(err));
     },
@@ -366,6 +435,11 @@ export default {
       aLink.dispatchEvent(evt);
       aLink.click();
     },
+    exportFile() {
+      const data = JSON.stringify(this.$cy.json(), null, "\t");
+      const blob = new Blob([data], {type: 'json'})
+      FileSaver.saveAs(blob, 'ohpoorcoin.json')
+    },
     //获取图
     async getGraphList(){
       this.question=this.$route.query.question
@@ -387,6 +461,14 @@ export default {
       this.$cy.layout({name: 'cose',randomize: false,animate: false,padding:0,componentSpacing: 30,nodeOverlap:4
       }).run()
       this.refresh()
+      for(var tag in this.question.tags){
+        // var flag=this.tags.findIndex(tag)
+        // console.log(flag)
+        // if(flag==-1){
+        //   this.tags.push(tag)
+        // }
+        this.tags.add(this.question.tags[tag])
+      }
       this.scratch()
     },
     async store_data(node_name){
@@ -501,6 +583,14 @@ export default {
             data,
             classes: classes+data.size,
           })
+          for(var tag in node.node_content.tags){
+            // var flag=this.tags.findIndex(tag)
+            // console.log(flag)
+            // if(flag==-1){
+            //   this.tags.push(tag)
+            // }
+            this.tags.add(node.node_content.tags[tag])
+          }
           // this.$cy.$(data.id).addClass("question")
         }
         else{

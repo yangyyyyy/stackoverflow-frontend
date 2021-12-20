@@ -21,3 +21,7 @@ export function PythonContentAPI(id){
 export function PythonQuestionContentAPI(id){
     return http.get(`http://localhost:5000/pyapi/chart/qcontent/${id}`)
 }
+
+export function PythonTagFaqAPI(tagname) {
+    return http.get(`http://localhost:5000/pyapi/chart/faq/${tagname}`)
+}

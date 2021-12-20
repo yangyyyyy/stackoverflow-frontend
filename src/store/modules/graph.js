@@ -1,4 +1,4 @@
-import {GetGraphAPI} from "../../api/graph"
+import {GetGraphAPI, PythonTagFaqAPI} from "../../api/graph"
 import {GetPythonGraphAPI} from "@/api/graph";
 const graph={
     state:{
@@ -898,6 +898,15 @@ const graph={
                     commit("set_searchResult",res.results)
                 })
                 .catch((err) => console.log(err));
+        },
+
+        async getTagFAQ({commit}, data) {
+            await PythonTagFaqAPI(data)
+                .then((res) => {
+                    console.log(res)
+                    commit('set_searchResult', res.results)
+                })
+                .catch((err) => console.log(err))
         }
 
     }

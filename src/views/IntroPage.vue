@@ -1,5 +1,5 @@
 <template>
-    <el-container direction="vertical">
+    <el-container direction="vertical" style="position:absolute;background-color: #faf7f1;width: 100%;height: 100%">
         <!--        <div class="top_line"></div>-->
         <el-header>
             <div class="header_left">logo</div>
@@ -17,29 +17,30 @@
                         <el-button slot="append" icon="el-icon-search" @click="search2" id="searchbtn"></el-button>
                     </el-input>
                 </div>
-                <div class="trend">
-                    <div class="trend_title">Hot Network Questions</div>
-                    <div class="trend_item" @click="search2">
-                        <div class="trend_no">1</div>
-                        <div class="trend_content">How were the special effects achieved for the Kraftwerk Die Roboter 1978 music video?</div>
-                    </div>
-                    <div class="trend_item" @click="search2">
-                        <div class="trend_no">2</div>
-                        <div class="trend_content">Which block cipher mode of operation does TLS 1.3 use?</div>
-                    </div>
-                    <div class="trend_item" @click="search2">
-                        <div class="trend_no">3</div>
-                        <div class="trend_content">How can I get around Intel RST thingy while trying to install Ubuntu?</div>
-                    </div>
-                    <div class="trend_item" @click="search2">
-                        <div class="trend_no">4</div>
-                        <div class="trend_content">What is the point of moving a fallen PC in the initiative order?</div>
-                    </div>
-                    <div class="trend_item" @click="search2" style="margin-bottom: 20px">
-                        <div class="trend_no">5</div>
-                        <div class="trend_content">Why is there a difference between `0--3//2` and `--3//2`?</div>
-                    </div>
-                </div>
+                <Wordcloud/>
+<!--                <div class="trend">-->
+<!--                    <div class="trend_title">Hot Network Questions</div>-->
+<!--                    <div class="trend_item" @click="search2">-->
+<!--                        <div class="trend_no">1</div>-->
+<!--                        <div class="trend_content">How were the special effects achieved for the Kraftwerk Die Roboter 1978 music video?</div>-->
+<!--                    </div>-->
+<!--                    <div class="trend_item" @click="search2">-->
+<!--                        <div class="trend_no">2</div>-->
+<!--                        <div class="trend_content">Which block cipher mode of operation does TLS 1.3 use?</div>-->
+<!--                    </div>-->
+<!--                    <div class="trend_item" @click="search2">-->
+<!--                        <div class="trend_no">3</div>-->
+<!--                        <div class="trend_content">How can I get around Intel RST thingy while trying to install Ubuntu?</div>-->
+<!--                    </div>-->
+<!--                    <div class="trend_item" @click="search2">-->
+<!--                        <div class="trend_no">4</div>-->
+<!--                        <div class="trend_content">What is the point of moving a fallen PC in the initiative order?</div>-->
+<!--                    </div>-->
+<!--                    <div class="trend_item" @click="search2" style="margin-bottom: 20px">-->
+<!--                        <div class="trend_no">5</div>-->
+<!--                        <div class="trend_content">Why is there a difference between `0&#45;&#45;3//2` and `&#45;&#45;3//2`?</div>-->
+<!--                    </div>-->
+<!--                </div>-->
             </el-main>
         </el-container>
     </el-container>
@@ -47,9 +48,11 @@
 
 <script>
     import {mapGetters, mapActions, mapMutations} from "vuex";
+    import Wordcloud from "../components/Wordcloud";
 
     export default {
         name: "IntroPage",
+        components: {Wordcloud},
         computed: {
             ...mapGetters([
                 'question'
@@ -90,7 +93,7 @@
         color: #a8222b;
         font-size: 60px;
         text-align: center;
-        margin-top: 5%;
+        margin-top: 3%;
         font-family:"Lucida Handwriting",Helvetica,sans-serif;
     }
     .searchBox2{
@@ -133,12 +136,6 @@
     }
     .trend_content:hover {
         color: #13a0bd;
-    }
-    .introBox {
-        width: 100%;
-        height: 100%;
-        background-color: #faf7f1;
-        padding-bottom: 0px;
     }
 
     .inputbox >>>.el-input__inner {

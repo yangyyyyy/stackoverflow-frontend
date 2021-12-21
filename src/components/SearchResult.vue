@@ -84,7 +84,7 @@
     }
     .reliability-num {
         color: #6a8fad;
-        font-size: 35px;
+        font-size: 30px;
         font-weight: bold;
         margin-bottom: 25px;
     }

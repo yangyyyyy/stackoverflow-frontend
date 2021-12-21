@@ -3,7 +3,6 @@
   <div class="drawer">
     <el-row>
       <el-col :span="18">
-<!--        <el-tag size="medium" v-for="tag in tags" :key="tag">{{tag}}</el-tag>-->
         <div id="cytoscape_id"></div>
         <div id="cytoolbar_id"
              style="position: absolute; left: 5pt; top: 5pt; z-index: 2; background-color: rgba(249, 249, 249, 0.9);" data-step="1" data-intro="欢迎来到新手引导！此处为工具栏">
@@ -37,40 +36,43 @@
               <Icon style="font-size: 32px; cursor: pointer;" title="文本导出" class="el-icon-document" @click="exportFile()"/>
             </div>
           </div>
-<!--          <div class="tools">-->
-<!--            <div class="center-center">-->
-<!--              <Icon style="font-size: 32px; cursor: pointer;" title="类型过滤" class="el-icon-s-flag"-->
-<!--                    @click="filterInit"/>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="tools">-->
-<!--            <div class="center-center">-->
-<!--              <Icon style="font-size: 32px; cursor: pointer;" title="搜索" class="el-icon-search" @click="searchDialogVisible=true"/>-->
-<!--            </div>-->
-<!--          </div>-->
         </div>
         <el-dialog v-dialogDrag title="搜索节点" :visible.sync="searchDialogVisible" :modal-append-to-body=false>
         </el-dialog>
       </el-col>
-      <el-col :span="6"><el-card class="box-card" style="height: auto">
-        <h2>当前节点数：{{this.nodesNum}}</h2>
-        <div v-if="showCard&&currentNode.answer_id==undefined">
-          <p>Question:{{currentNode.title}}</p>
-          <p>Answer_count:{{currentNode.answer_count}}</p>
-          <p>Score:{{currentNode.score}}</p>
-          <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
-        </div>
-        <div v-else-if="showCard">
-          <p>isAccepted:{{currentNode.is_accepted}}</p>
-          <p>Score:{{currentNode.score}}</p>
-          <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
-        </div>
-        <div v-if="detail!==''" v-html="detail"></div>
-        <el-table v-else
-                  v-loading="loading"
-                  element-loading-text="拼命加载中"
-                  element-loading-spinner="el-icon-loading"></el-table>
-      </el-card>
+      <el-col :span="6">
+        <el-card class="box-card" style="height: 400px;overflow: auto">
+          <h2>当前节点数：{{this.nodesNum}}</h2>
+          <div v-if="showCard&&currentNode.answer_id==undefined">
+            <p>Question:{{currentNode.title}}</p>
+            <p>Answer_count:{{currentNode.answer_count}}</p>
+            <p>Score:{{currentNode.score}}</p>
+            <el-tag size="medium" v-for="tag in currentNode.tags" :key="tag">{{tag}}</el-tag>
+          </div>
+          <div v-else-if="showCard">
+            <p>isAccepted:{{currentNode.is_accepted}}</p>
+            <p>Score:{{currentNode.score}}</p>
+          </div>
+          <div v-if="showDetail&&detail!==''" v-html="detail"></div>
+          <el-table v-if="showDetail&&detail==''"
+                    v-loading="loading"
+                    element-loading-text="拼命加载中"
+                    element-loading-spinner="el-icon-loading"></el-table>
+        </el-card>
+        <el-card style="margin-top:20px;height: 180px; overflow:auto">
+          <el-row>
+            <h2>问题标签</h2>
+<!--            <el-col :span="12"><h2>问题标签</h2></el-col>-->
+<!--            <el-col :span="12">-->
+<!--              <el-switch-->
+<!--                v-model="orand"-->
+<!--                active-text="or"-->
+<!--                inactive-text="and">-->
+<!--              </el-switch>-->
+<!--            </el-col>-->
+          </el-row>
+          <el-tag size="medium" v-for="tag in tags" :key="tag" @click="filterClasses(tag)">{{tag}}</el-tag>
+        </el-card>
       </el-col>
     </el-row>
   </div>
@@ -125,6 +127,10 @@ export default {
       that.currentNode=e.target.data().content
       that.showCard=true
       that.detail=""
+      that.showDetail=false
+    })
+    this.$cy.on('click','node',function(){
+      that.showDetail=true
       if(that.currentNode.answer_id==undefined){
         that.showQuestionContent(that.currentNode.question_id)
       }
@@ -201,7 +207,7 @@ export default {
       .selector(".6")
       .style({'background-color': '#B0E0E6'})
       .selector(".related")
-      .style({"line-color": "#FFFACD" /* 线条颜色 */,})
+      .style({"line-color": "#f3e98e" /* 线条颜色 */,})
       .selector(".answer")
       .style({"line-color": '#48D1CC' /* 线条颜色 */,})
     ;
@@ -210,10 +216,10 @@ export default {
             .style({'background-color': '#eaabb0',width:i+10,height:i+10})
         .update()
         this.$cy.style().selector('.a'+i)
-            .style({'background-color': '#99f6a0',width:i+10,height:i+10})
+            .style({'background-color': '#b299f6',width:i+10,height:i+10})
             .update()
         this.$cy.style().selector('.aa'+i)
-            .style({'background-color': '#25ee35',width:i+10,height:i+10})
+            .style({'background-color': '#b825ee',width:i+10,height:i+10})
             .update()
       }
     // Cxtmenu圆形菜单--开始
@@ -235,12 +241,10 @@ export default {
             // contentStyle: {}, // css key:value pairs to set the command's css in js if you want
             select: () => {
               if(this.currentNode.answer_id==undefined){
-                this.showQuestionContent(this.currentNode.question_id)
-                //window.open(this.currentNode.link)
+                window.open(this.currentNode.link)
               }
               else{
-                //url = "https://stackoverflow.com/a/"+this.currentNode.answer_id
-                this.showContent(this.currentNode.answer_id)
+                window.open("https://stackoverflow.com/a/"+this.currentNode.answer_id)
               }
             },  // a function to execute when the command is selected
             enablxzed: true, // whether the command is selectable
@@ -284,6 +288,8 @@ export default {
       loading:true,
       searchDialogVisible:false,
       tags:new Set,
+      showDetail:false,
+      orand:true,
     }
   },
   methods:{
@@ -440,6 +446,31 @@ export default {
       const blob = new Blob([data], {type: 'json'})
       FileSaver.saveAs(blob, 'ohpoorcoin.json')
     },
+    filterClasses(filterValue) {
+      this.$cy.startBatch();
+      this.$cy.batch(() => {
+          this.$cy.elements().removeClass("light-off");
+          this.$cy.elements().addClass("light-off"); //*添加样式*/
+          this.$cy.elements().map(function (ele) {
+            if(ele.data().node_group!='question'){
+              return;
+            }
+            var list=ele.data().content.tags
+            console.log(list)
+            for(var tag in list){
+              if(list[tag]==filterValue){
+                ele.removeClass("light-off");
+                ele.connectedEdges().removeClass("light-off");
+              }
+            }
+          })
+        });
+      this.$cy.once('click', () => this.lightOff());
+      this.$cy.endBatch();
+      this.filterValue = '';
+      // this.$cy.zoom(9)
+
+    },
     //获取图
     async getGraphList(){
       this.question=this.$route.query.question
@@ -455,6 +486,7 @@ export default {
           name:this.getQuestion(this.question.title,75),
           size:this.question.score,
           content:this.question,
+          node_group:'question',
         },
         classes: '1',
       })
@@ -462,11 +494,6 @@ export default {
       }).run()
       this.refresh()
       for(var tag in this.question.tags){
-        // var flag=this.tags.findIndex(tag)
-        // console.log(flag)
-        // if(flag==-1){
-        //   this.tags.push(tag)
-        // }
         this.tags.add(this.question.tags[tag])
       }
       this.scratch()
@@ -584,14 +611,8 @@ export default {
             classes: classes+data.size,
           })
           for(var tag in node.node_content.tags){
-            // var flag=this.tags.findIndex(tag)
-            // console.log(flag)
-            // if(flag==-1){
-            //   this.tags.push(tag)
-            // }
             this.tags.add(node.node_content.tags[tag])
           }
-          // this.$cy.$(data.id).addClass("question")
         }
         else{
           data.id=node.edge_name
@@ -635,3 +656,15 @@ export default {
   }
 };
 </script>
+<style scoped>
+.el-tag {
+  background-color: #91b1cb;
+  color: #ffffff;
+  border: none;
+  margin-right: 10px;
+  margin-top: 5px;
+}
+.el-tag:hover {
+  background-color: #5a97c9;
+}
+</style>

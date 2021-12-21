@@ -8,7 +8,7 @@
                     width="200"
                     trigger="hover"
                     :content="detail">
-                <span slot="reference"> <div class="reliability-num">85%</div></span>
+                <span slot="reference"> <div class="reliability-num">{{(100.0*(item.score+item.answer_count)/this.max_score).toFixed(2)}}%</div></span>
             </el-popover>
             <el-button icon="el-icon-share" @click="toGraph(item)">查看图谱</el-button>
         </div>
@@ -27,7 +27,8 @@
         name: "SearchResult",
         computed: {
             ...mapGetters([
-                'currentId'
+                'currentId',
+                'max_score'
             ])
         },
         mounted () {

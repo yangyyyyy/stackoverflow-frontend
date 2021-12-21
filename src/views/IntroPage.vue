@@ -71,7 +71,8 @@
                 'set_question'
             ]),
             ...mapActions([
-                'getResult'
+                'getResult',
+                'getTagFAQ'
             ]),
             async search2 () {
                 // console.log(this.showResult)

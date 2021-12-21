@@ -64,7 +64,8 @@ export default {
         'set_question'
       ]),
       ...mapActions([
-        'getResult'
+        'getResult',
+        'getTagFAQ'
       ]),
         async search () {
           await this.getResult(this.searchInput)

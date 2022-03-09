@@ -92,15 +92,25 @@ const graph={
         async getResult({commit},question){
             function compare(){
                 return function(a,b){
-                    var value1 = a['score']+a['answer_count'];
-                    var value2 = b['score']+b['answer_count'];
+                    var value1 = a['score'];
+                    var value2 = b['score'];
                     return value2 - value1;
+                }
+            }
+            function compute_question_score(){
+                return function(results){
+                    for(var i=0;i<results.length();i++){
+                        results[i]['score'] = ((results[i]['score']*results[i]['answer_count'])/5+4*Math.log(results[i]['view_count']))*0.9;
+                        results[i]['score'] = results[i]['score']+0.1*results[i]['owner']['reputation']
+                    }
+                    return results
                 }
             }
 
             console.log("搜索后"+question)
             await GetPythonGraphAPI(question)
                 .then((res)=>{
+                    res.results = compute_question_score(res.results)
                     var sorted_res = res.results.sort(compare())
                     if (sorted_res[0]['score']+sorted_res[0]['answer_count']>0){
                         commit('set_max_score',sorted_res[0]['score']+sorted_res[0]['answer_count'])

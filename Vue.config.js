@@ -12,7 +12,7 @@ module.exports = {
               }
             },
             "/pyapi": {
-                target: "http://backend-server:5000",
+                target: "http://localhost:30000",
                 change: true,
                 ws: true,//websocket支持
                 secure: false,

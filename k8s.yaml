@@ -28,26 +28,8 @@ metadata:
     app: frondend
 spec:
   ports:
-    - port: 8081
+    - port: 80
       protocol: TCP
       targetPort: 80
   selector:
     app: frondend
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: frondend
-  namespace: test
-spec:
-  rules:
-    - host: frondend.devopsplus.com.cn
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: frondend
-                port:
-                  number: 14237

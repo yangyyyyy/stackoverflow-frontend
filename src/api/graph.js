@@ -7,21 +7,21 @@ export function GetGraphAPI(params){
 }
 
 export function GetPythonGraphAPI(input){
-    return http.get(`http://localhost:30000/pyapi/chart/search/${input}`)
+    return http.get(`http://172.29.7.157:30000/pyapi/chart/search/${input}`)
 }
 
 export function PythonScratchAPI(question_id){
-    return http.get(`http://localhost:30000/pyapi/chart/scratch/${question_id}`)
+    return http.get(`http://172.29.7.157:30000/pyapi/chart/scratch/${question_id}`)
 }
 
 export function PythonContentAPI(id){
-    return http.get(`http://localhost:30000/pyapi/chart/content/${id}`)
+    return http.get(`http://172.29.7.157:30000/pyapi/chart/content/${id}`)
 }
 
 export function PythonQuestionContentAPI(id){
-    return http.get(`http://localhost:30000/pyapi/chart/qcontent/${id}`)
+    return http.get(`http://172.29.7.157:30000/pyapi/chart/qcontent/${id}`)
 }
 
 export function PythonTagFaqAPI(tagname) {
-    return http.get(`http://localhost:30000/pyapi/chart/faq/${tagname}`)
+    return http.get(`http://172.29.7.157:30000/pyapi/chart/faq/${tagname}`)
 }
